@@ -77,6 +77,30 @@ static float PickerViewH  = 200;
     }
 }
 
+- (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view {
+    
+    /*重新定义row 的UILabel*/
+    UILabel *pickerLabel = (UILabel*)view;
+    if (!pickerLabel) {
+            pickerLabel = [[UILabel alloc] init];
+            // Setup label properties - frame, font, colors etc
+            //adjustsFontSizeToFitWidth property to YES
+            [pickerLabel setTextColor:[UIColor darkGrayColor]];
+            pickerLabel.adjustsFontSizeToFitWidth = YES;
+            [pickerLabel setTextAlignment:NSTextAlignmentCenter];
+            [pickerLabel setBackgroundColor:[UIColor clearColor]];
+            [pickerLabel setFont:[UIFont systemFontOfSize:16.0f]];
+        }
+    
+    if (component == 0) {
+        //pickerLabel.attributedText = [self pickerView:pickerView attributedTitleForRow:_firstIndex forComponent:component];
+        pickerLabel.text = [self pickerView:pickerView titleForRow:row forComponent:component];
+    } else {
+        pickerLabel.text = [self pickerView:pickerView titleForRow:row forComponent:component];
+    }
+    return pickerLabel;
+}
+
 /**
     界面设置
  */
@@ -89,7 +113,7 @@ static float PickerViewH  = 200;
     if (@available(iOS 13.0, *)) {
         datePickerView.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
             if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-                return [UIColor blackColor];
+                return [UIColor whiteColor];
             }
             return [UIColor whiteColor];
         }];
@@ -133,11 +157,23 @@ static float PickerViewH  = 200;
 - (UIToolbar *)toolBar {
     if (!_toolBar) {
 
-        _toolBar = [[UIToolbar alloc] init];
-        _toolBar.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, ToolbarH);
+        _toolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, ToolbarH)];
+        //_toolBar.backgroundColor = [UIColor whiteColor];
+        if (@available(iOS 13.0, *)) {
+            _toolBar.barTintColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+                if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                    return [UIColor whiteColor];
+                }
+                return [UIColor whiteColor];
+            }];
+        }
         UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:@"   取消" style:UIBarButtonItemStylePlain target:self action:@selector(remove)];
         UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
         UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithTitle:@"确认   " style:UIBarButtonItemStylePlain target:self action:@selector(doneClick)];
+        
+        //设置字体颜色
+//        [doneItem setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont fontWithName:@"PingFang-SC-Regular" size:15],NSFontAttributeName, nil] forState:UIControlStateNormal];
+//        [doneItem setTintColor:[UIColor colorWithRed:85 / 255.0 green:135 / 255.0 blue:238 / 255.0 alpha:1]];
 
         _toolBar.items = @[cancelItem, flexSpace, doneItem];
     }
